@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Descobrimento do Brasil — WebGame Educacional</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --parch: #f5e6c8;
+    --parch-dark: #e8d4a0;
+    --parch-deep: #c10aa72;
+    --ink: #2b1d0e;
+    --ink-light: #5c3d1e;
+    --ocean: #2a4a6b;
+    --ocean-light: #3d6a99;
+    --red: #8b1a1a;
+    --gold: #b8861b;
+    --gold-light: #d4a017;
+    --green-old: #3d6b3d;
+    --locked: #9e9080;
+    --success: #2e6b2e;
+  }
+
+  body {
+    font-family: 'Crimson Text', Georgia, serif;
+    background: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+  }
+
+  /* ── TELA DE INÍCIO ── */
+  #tela-inicio {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center, #1a0f05 0%, #0a0604 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 1000; padding: 2rem;
+    text-align: center;
+  }
+  .inicio-deco {
+    font-size: 3.5rem; margin-bottom: 1rem;
+    filter: drop-shadow(0 0 20px rgba(212,160,23,0.6));
+  }
+  .inicio-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.4rem, 4vw, 2.6rem);
+    color: var(--gold-light);
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
+  }
+  .inicio-sub {
+    font-size: 1.1rem; color: var(--parch-dark);
+    margin-bottom: 2rem; font-style: italic;
+  }
+  .inicio-form {
+    background: rgba(245,230,200,0.07);
+    border: 1px solid var(--gold);
+    border-radius: 12px; padding: 1.5rem 2rem;
+    width: 100%; max-width: 420px;
+    margin-bottom: 1.5rem;
+  }
+  .inicio-form label {
+    display: block; font-family: 'Cinzel', serif;
+    font-size: 0.8rem; color: var(--parch-dark);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+  .inicio-form input {
+    width: 100%; padding: 0.55rem 0.8rem;
+    background: rgba(245,230,200,0.1);
+    border: 1px solid var(--parch-deep);
+    border-radius: 6px; color: var(--parch);
+    font-family: 'Crimson Text', serif; font-size: 1.1rem;
+    margin-bottom: 1rem; outline: none;
+    transition: border-color 0.2s;
+  }
+  .inicio-form input:focus { border-color: var(--gold-light); }
+  .btn-iniciar {
+    font-family: 'Cinzel', serif; font-size: 1rem;
+    letter-spacing: 0.08em; font-weight: 600;
+    color: var(--ink); background: var(--gold-light);
+    border: none; border-radius: 8px;
+    padding: 0.75rem 2.5rem; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-iniciar:hover { background: #e8b820; transform: scale(1.03); }
+  .inicio-instrucoes {
+    max-width: 480px; color: var(--parch-dark);
+    font-size: 0.95rem; line-height: 1.6;
+    border-top: 1px solid rgba(184,134,11,0.3);
+    padding-top: 1rem; margin-top: 0.5rem;
+  }
+
+  /* ── LAYOUT PRINCIPAL ── */
+  #jogo {
+    display: none;
+    width: 100%; max-width: 1200px;
+    min-height: 90vh;
+    background: var(--parch);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(0,0,0,0.7);
+    position: relative;
+  }
+
+
+  .jogo-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    grid-template-rows: auto 1fr;
+    min-height: 90vh;
+    position: relative; z-index: 1;
+  }
+
+  /* ── CABEÇALHO ── */
+  .cabecalho {
+    grid-column: 1 / -1;
+    background: var(--ink);
+    color: var(--parch);
+    padding: 0.7rem 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 3px solid var(--gold);
+  }
+  .cabecalho-title {
+    font-family: 'Cinzel', serif; font-size: 1.1rem;
+    color: var(--gold-light); letter-spacing: 0.06em;
+  }
+  .cabecalho-dupla {
+    font-size: 0.9rem; color: var(--parch-dark);
+    font-style: italic;
+  }
+  .cabecalho-prog {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--parch-dark);
+  }
+  .prog-bar-wrap {
+    width: 120px; height: 8px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 4px; overflow: hidden;
+  }
+  .prog-bar-fill {
+    height: 100%; background: var(--gold-light);
+    border-radius: 4px; transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* ── ÁREA DO MAPA ── */
+  .area-mapa {
+    position: relative;
+    overflow: hidden;
+    min-height: 560px;
+    background: #b8955a;
+  }
+  .mapa-svg-bg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    display: block; z-index: 0;
+  }
+
+  /* ── PONTOS DO MAPA ── */
+  .ponto {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  .ponto-marcador {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.85rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    border: 2px solid transparent;
+  }
+
+  .ponto.bloqueado .ponto-marcador {
+    background: var(--locked);
+    color: rgba(43,29,14,0.4);
+    border-color: rgba(43,29,14,0.15);
+    cursor: not-allowed;
+  }
+  .ponto.ativo .ponto-marcador {
+    background: var(--gold-light);
+    color: var(--ink);
+    border-color: var(--ink);
+    box-shadow: 0 0 0 4px rgba(212,160,23,0.25),
+                0 0 14px rgba(212,160,23,0.4);
+    animation: pulsar 2s infinite;
+  }
+  .ponto.concluido .ponto-marcador {
+    background: var(--success);
+    color: var(--parch);
+    border-color: rgba(43,29,14,0.3);
+  }
+  .ponto.errado .ponto-marcador {
+    background: var(--red);
+    color: var(--parch);
+    border-color: rgba(43,29,14,0.3);
+  }
+  .ponto.ativo:hover .ponto-marcador {
+    transform: scale(1.18);
+    box-shadow: 0 0 0 6px rgba(212,160,23,0.3),
+                0 0 20px rgba(212,160,23,0.5);
+  }
+
+  .ponto-label {
+    position: absolute; top: 110%; left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-family: 'Cinzel', serif; font-size: 0.6rem;
+    color: var(--ink); background: rgba(245,230,200,0.88);
+    padding: 2px 6px; border-radius: 3px;
+    border: 1px solid var(--parch-deep);
+    opacity: 0; transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .ponto.ativo:hover .ponto-label,
+  .ponto.concluido:hover .ponto-label { opacity: 1; }
+
+  @keyframes pulsar {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(212,160,23,0.25), 0 0 14px rgba(212,160,23,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(212,160,23,0.15), 0 0 24px rgba(212,160,23,0.6); }
+  }
+
+  /* Linha de trilha conectando pontos */
+  .trilha-svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 5;
+  }
+
+  /* ── PAINEL LATERAL ── */
+  .painel {
+    background: rgba(43,29,14,0.06);
+    border-left: 2px solid var(--parch-deep);
+    padding: 1rem;
+    display: flex; flex-direction: column; gap: 1rem;
+    overflow-y: auto;
+  }
+
+  .painel-secao {
+    background: rgba(255,255,255,0.5);
+    border: 1px solid var(--parch-deep);
+    border-radius: 8px; padding: 0.85rem;
+  }
+  .painel-secao-title {
+    font-family: 'Cinzel', serif; font-size: 0.7rem;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--ink-light); margin-bottom: 0.6rem;
+    border-bottom: 1px solid var(--parch-deep);
+    padding-bottom: 0.4rem;
+  }
+
+  /* Pontuação */
+  .pontuacao-num {
+    font-family: 'Cinzel', serif; font-size: 2rem;
+    font-weight: 700; color: var(--gold);
+    text-align: center; line-height: 1;
+  }
+  .pontuacao-max {
+    font-size: 0.8rem; color: var(--ink-light);
+    text-align: center; margin-top: 2px;
+  }
+
+  /* Dupla */
+  .dupla-nomes { font-size: 0.92rem; color: var(--ink); line-height: 1.5; }
+  .dupla-nomes strong { font-weight: 600; }
+
+  /* Selos */
+  .selos-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .selo {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    background: rgba(43,29,14,0.07);
+    border: 1.5px dashed var(--locked);
+    transition: all 0.3s;
+    position: relative;
+  }
+  .selo.conquistado {
+    background: var(--gold-light);
+    border: 2px solid var(--gold);
+    animation: seloAnim 0.5s ease;
+    box-shadow: 0 2px 8px rgba(184,134,11,0.35);
+  }
+  @keyframes seloAnim {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .selo-tooltip {
+    display: none;
+    position: absolute; bottom: 110%; left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink); color: var(--parch);
+    font-size: 0.65rem; padding: 3px 7px;
+    border-radius: 4px; white-space: nowrap;
+    font-family: 'Cinzel', serif; z-index: 20;
+  }
+  .selo:hover .selo-tooltip { display: block; }
+
+  /* Legenda */
+  .legenda-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.82rem; color: var(--ink-light);
+    margin-bottom: 4px;
+  }
+  .leg-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(10,6,2,0.75);
+    z-index: 100;
+    align-items: center; justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.aberto { display: flex; }
+
+  .modal {
+    background: var(--parch);
+    border: 3px solid var(--gold);
+    border-radius: 12px;
+    max-width: 620px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    position: relative;
+    box-shadow: 0 0 60px rgba(0,0,0,0.6),
+                inset 0 0 40px rgba(184,134,11,0.05);
+    animation: modalEntra 0.3s ease;
+  }
+  @keyframes modalEntra {
+    from { transform: scale(0.9) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  .modal-header {
+    background: var(--ink);
+    color: var(--parch);
+    padding: 0.9rem 1.2rem;
+    border-radius: 8px 8px 0 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .modal-num {
+    font-family: 'Cinzel', serif;
+    background: var(--gold-light); color: var(--ink);
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1rem; flex-shrink: 0;
+  }
+  .modal-titulo {
+    font-family: 'Cinzel', serif;
+    font-size: 1.15rem; color: var(--gold-light);
+    font-weight: 600; letter-spacing: 0.04em;
+  }
+  .modal-fechar {
+    margin-left: auto;
+    background: none; border: none;
+    color: var(--parch-deep); font-size: 1.4rem;
+    cursor: pointer; padding: 0 4px;
+    transition: color 0.2s;
+  }
+  .modal-fechar:hover { color: var(--parch); }
+
+  .modal-corpo { padding: 1.2rem; }
+
+  .modal-historia {
+    background: rgba(43,29,14,0.05);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 6px 6px 0;
+    padding: 0.9rem 1rem;
+    margin-bottom: 1.2rem;
+    font-size: 1.05rem; line-height: 1.65;
+    color: var(--ink);
+  }
+  .modal-historia strong { color: var(--red); font-weight: 600; }
+
+  .modal-pergunta-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--ocean);
+    margin-bottom: 0.5rem;
+  }
+  .modal-pergunta {
+    font-size: 1.05rem; font-weight: 600;
+    color: var(--ink); margin-bottom: 1rem;
+    line-height: 1.45;
+  }
+
+  .opcoes { display: flex; flex-direction: column; gap: 8px; }
+  .opcao {
+    background: rgba(255,255,255,0.55);
+    border: 1.5px solid var(--parch-deep);
+    border-radius: 8px; padding: 0.7rem 1rem;
+    cursor: pointer; display: flex; gap: 10px;
+    align-items: flex-start;
+    transition: background 0.15s, border-color 0.15s;
+    font-size: 1rem; color: var(--ink);
+    text-align: left;
+  }
+  .opcao:hover:not(:disabled) {
+    background: rgba(212,160,23,0.12);
+    border-color: var(--gold);
+  }
+  .opcao.correta {
+    background: rgba(46,107,46,0.15) !important;
+    border-color: var(--success) !important;
+    color: var(--success);
+  }
+  .opcao.errada {
+    background: rgba(139,26,26,0.1) !important;
+    border-color: var(--red) !important;
+    color: var(--red);
+  }
+  .opcao:disabled { cursor: default; }
+  .opcao-letra {
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: 0.9rem; min-width: 22px;
+    color: var(--gold); line-height: 1.4;
+  }
+
+  .modal-feedback {
+    display: none;
+    margin-top: 1rem; padding: 0.8rem 1rem;
+    border-radius: 8px; font-size: 0.98rem;
+    line-height: 1.5; border: 1px solid;
+  }
+  .modal-feedback.acerto {
+    display: block;
+    background: rgba(46,107,46,0.12);
+    border-color: var(--success); color: var(--success);
+  }
+  .modal-feedback.erro {
+    display: block;
+    background: rgba(139,26,26,0.08);
+    border-color: var(--red); color: var(--red);
+  }
+
+  .btn-proximo {
+    display: none;
+    width: 100%; margin-top: 1rem;
+    font-family: 'Cinzel', serif; font-size: 0.95rem;
+    font-weight: 600; letter-spacing: 0.06em;
+    background: var(--ink); color: var(--gold-light);
+    border: 2px solid var(--gold); border-radius: 8px;
+    padding: 0.75rem; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-proximo:hover { background: #1a0f07; }
+
+  /* ── TELA DE VITÓRIA ── */
+  .modal-vitoria {
+    background: var(--ink);
+    border-radius: 12px; padding: 2rem;
+    text-align: center; max-width: 580px;
+    width: 100%;
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 80px rgba(212,160,23,0.3);
+    animation: modalEntra 0.4s ease;
+  }
+  .vitoria-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+  .vitoria-title {
+    font-family: 'Cinzel', serif; font-size: 1.8rem;
+    color: var(--gold-light); margin-bottom: 0.3rem;
+  }
+  .vitoria-sub {
+    color: var(--parch-dark); font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .vitoria-placar {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; margin-bottom: 1.5rem;
+  }
+  .placar-card {
+    background: rgba(245,230,200,0.07);
+    border: 1px solid rgba(184,134,11,0.3);
+    border-radius: 8px; padding: 0.8rem;
+  }
+  .placar-num {
+    font-family: 'Cinzel', serif; font-size: 1.8rem;
+    color: var(--gold-light); font-weight: 700;
+  }
+  .placar-label {
+    font-size: 0.78rem; color: var(--parch-dark);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .vitoria-nota {
+    font-family: 'Cinzel', serif; font-size: 1rem;
+    color: var(--parch); margin-bottom: 0.3rem;
+  }
+  .nota-display {
+    display: inline-block;
+    font-family: 'Cinzel', serif; font-size: 3rem;
+    font-weight: 700; color: var(--gold-light);
+    padding: 0.3rem 1.5rem;
+    border: 2px solid var(--gold);
+    border-radius: 12px; margin-bottom: 1.2rem;
+    background: rgba(184,134,11,0.1);
+  }
+  .vitoria-selos {
+    display: flex; flex-wrap: wrap;
+    justify-content: center; gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+  .vitoria-selos .selo { width: 42px; height: 42px; font-size: 1.3rem; }
+  .btn-reiniciar {
+    font-family: 'Cinzel', serif; font-size: 0.9rem;
+    letter-spacing: 0.06em; font-weight: 600;
+    background: var(--gold-light); color: var(--ink);
+    border: none; border-radius: 8px;
+    padding: 0.7rem 2rem; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-reiniciar:hover { background: #e8b820; }
+  .vitoria-dupla {
+    font-size: 1rem; color: var(--parch-dark);
+    font-style: italic; margin-bottom: 1rem;
+  }
+
+  /* ── RESPONSIVO ── */
+  @media (max-width: 700px) {
+    .jogo-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; }
+    .painel { border-left: none; border-top: 2px solid var(--parch-deep); max-height: 240px; }
+    .cabecalho-dupla { display: none; }
+  }
+
+  /* ── RODAPÉ ── */
+  .rodape {
+    background: var(--ink);
+    border-top: 3px solid var(--gold);
+    padding: 22px 24px 18px;
+    text-align: center;
+    grid-column: 1 / -1;
+  }
+  .rodape .nome {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: var(--parch);
+    margin-bottom: 6px;
+    letter-spacing: 0.06em;
+  }
+  .rodape .nome span {
+    color: var(--gold-light);
+    font-weight: 700;
+  }
+  .rodape .rodape-sub {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .rodape .contatos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  .rodape .contatos a {
+    color: var(--parch-dark);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .rodape .contatos a:hover { color: var(--gold-light); }
+  .rodape .contatos i { font-size: 0.95rem; }
+
+  /* ── RODAPÉ TELA DE INÍCIO ── */
+  .inicio-rodape {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 14px 20px;
+    border-top: 1px solid rgba(184,134,11,0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .inicio-rodape .nome {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    color: var(--parch-deep);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .inicio-rodape .nome span {
+    color: var(--gold);
+  }
+  .inicio-rodape .rodape-sub {
+    font-size: 0.72rem;
+    color: rgba(148,163,184,0.7);
+    letter-spacing: 0.08em;
+    font-style: italic;
+    margin: 0;
+  }
+  .inicio-rodape .contatos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+  }
+  .inicio-rodape .contatos a {
+    color: rgba(201,170,114,0.55);
+    text-decoration: none;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .inicio-rodape .contatos a:hover { color: var(--gold-light); }
+  .inicio-rodape .contatos i { font-size: 0.68rem; }
+</style>
+</head>
+<body>
+
+<!-- ══ TELA DE INÍCIO ══ -->
+<div id="tela-inicio">
+  <div class="inicio-deco">⚓</div>
+  <h1 class="inicio-title">Descobrimento do Brasil</h1>
+  <p class="inicio-sub">Uma jornada de 1500 — WebGame Educacional</p>
+
+  <div class="inicio-form">
+    <label for="nome1">⚓ Explorador 1</label>
+    <input type="text" id="nome1" placeholder="Nome do primeiro aluno" maxlength="24">
+    <label for="nome2">🧭 Explorador 2</label>
+    <input type="text" id="nome2" placeholder="Nome do segundo aluno" maxlength="24">
+  </div>
+  <button class="btn-iniciar" onclick="iniciarJogo()">Zarpar para o Novo Mundo →</button>
+  <div class="inicio-instrucoes">
+    Jogando em dupla · 10 pontos históricos · Responda para avançar<br>
+    A dupla só pode SEGUIR ao ponto seguinte após responder ao atual.
+  </div>
+  <footer class="inicio-rodape">
+    <div class="nome">Profª <span>Synthia Duarte</span> © 2026</div>
+    <p class="rodape-sub">Docente Especialista em Informática &amp; Robótica Educativa</p>
+    <div class="contatos">
+      <a href="mailto:profasynthia.fc.duarte@gmail.com">
+        <i class="fas fa-envelope"></i> profasynthia.fc.duarte@gmail.com
+      </a>
+      <a href="https://www.tiktok.com/@robotica.livre" target="_blank">
+        <i class="fab fa-tiktok"></i> TikTok @robotica.livre
+      </a>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ JOGO PRINCIPAL ══ -->
+<div id="jogo">
+  <div class="jogo-layout">
+
+    <!-- Cabeçalho -->
+    <header class="cabecalho">
+      <span class="cabecalho-title">⚓ Descobrimento do Brasil — 1500</span>
+      <span class="cabecalho-dupla" id="hdr-dupla"></span>
+      <div class="cabecalho-prog">
+        <span id="prog-texto">0/10</span>
+        <div class="prog-bar-wrap"><div class="prog-bar-fill" id="prog-bar"></div></div>
+        <button id="btn-mudo" onclick="toggleMudo()" title="Som" style="background:none;border:1px solid rgba(212,160,23,0.4);border-radius:6px;color:var(--gold-light);font-size:0.9rem;cursor:pointer;padding:2px 7px;margin-left:6px;transition:opacity 0.2s">🔊</button>
+      </div>
+    </header>
+
+    <!-- Área do Mapa -->
+    <main class="area-mapa" id="area-mapa">
+
+      <!-- SVG MAPA ANTIGO ILUSTRADO -->
+      <svg class="mapa-svg-bg" viewBox="0 0 860 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Pergaminho base -->
+          <radialGradient id="parch-grad" cx="50%" cy="45%" r="70%">
+            <stop offset="0%" stop-color="#f0d898"/>
+            <stop offset="55%" stop-color="#ddb96a"/>
+            <stop offset="100%" stop-color="#a07830"/>
+          </radialGradient>
+          <!-- Oceano -->
+          <radialGradient id="ocean-grad" cx="30%" cy="50%" r="75%">
+            <stop offset="0%" stop-color="#4a7fa8"/>
+            <stop offset="60%" stop-color="#2d5f82"/>
+            <stop offset="100%" stop-color="#1a3d57"/>
+          </radialGradient>
+          <!-- Terra Brasil -->
+          <radialGradient id="terra-grad" cx="40%" cy="40%" r="70%">
+            <stop offset="0%" stop-color="#8faf5c"/>
+            <stop offset="50%" stop-color="#6a8f3e"/>
+            <stop offset="100%" stop-color="#4a6a28"/>
+          </radialGradient>
+          <!-- Terra África -->
+          <radialGradient id="africa-grad" cx="50%" cy="40%" r="60%">
+            <stop offset="0%" stop-color="#c8a45e"/>
+            <stop offset="60%" stop-color="#a07830"/>
+            <stop offset="100%" stop-color="#7a5820"/>
+          </radialGradient>
+          <!-- Vinheta escura nas bordas -->
+          <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+            <stop offset="60%" stop-color="transparent"/>
+            <stop offset="100%" stop-color="rgba(40,20,5,0.45)"/>
+          </radialGradient>
+          <!-- Filtro de envelhecimento -->
+          <filter id="age" x="-5%" y="-5%" width="110%" height="110%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" result="noise"/>
+            <feColorMatrix type="saturate" values="0" in="noise" result="gray"/>
+            <feBlend in="SourceGraphic" in2="gray" mode="multiply" result="blended"/>
+            <feComposite in="blended" in2="SourceGraphic" operator="in"/>
+          </filter>
+          <!-- Padrão de ondas do oceano -->
+          <pattern id="waves" x="0" y="0" width="28" height="14" patternUnits="userSpaceOnUse">
+            <path d="M0 7 Q7 1 14 7 Q21 13 28 7" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+          </pattern>
+          <!-- Padrão de floresta -->
+          <pattern id="forest" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+            <polygon points="8,2 5,10 11,10" fill="rgba(40,70,20,0.25)"/>
+          </pattern>
+          <!-- Grade cartográfica -->
+          <pattern id="grid" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+            <path d="M60 0 L0 0 L0 60" fill="none" stroke="rgba(100,60,10,0.12)" stroke-width="0.6"/>
+          </pattern>
+        </defs>
+
+        <!-- 1. FUNDO PERGAMINHO -->
+        <rect width="860" height="560" fill="url(#parch-grad)"/>
+        <!-- Manchas de envelhecimento -->
+        <ellipse cx="120" cy="80" rx="90" ry="50" fill="rgba(100,60,10,0.06)"/>
+        <ellipse cx="700" cy="480" rx="120" ry="60" fill="rgba(80,40,5,0.07)"/>
+        <ellipse cx="430" cy="280" rx="200" ry="120" fill="rgba(255,220,140,0.12)"/>
+        <ellipse cx="800" cy="100" rx="70" ry="40" fill="rgba(90,50,10,0.05)"/>
+        <ellipse cx="50" cy="400" rx="60" ry="80" fill="rgba(70,35,5,0.07)"/>
+
+        <!-- 2. GRADE CARTOGRÁFICA -->
+        <rect width="860" height="560" fill="url(#grid)" opacity="0.8"/>
+        <!-- Linhas de latitude principais -->
+        <line x1="0" y1="80"  x2="860" y2="80"  stroke="rgba(100,60,10,0.18)" stroke-width="0.8" stroke-dasharray="4,3"/>
+        <line x1="0" y1="200" x2="860" y2="200" stroke="rgba(100,60,10,0.22)" stroke-width="1.2"/>
+        <line x1="0" y1="280" x2="860" y2="280" stroke="rgba(100,60,10,0.28)" stroke-width="1.5"/>
+        <line x1="0" y1="360" x2="860" y2="360" stroke="rgba(100,60,10,0.18)" stroke-width="0.8" stroke-dasharray="4,3"/>
+        <line x1="0" y1="460" x2="860" y2="460" stroke="rgba(100,60,10,0.15)" stroke-width="0.8" stroke-dasharray="4,3"/>
+        <!-- Linhas de longitude -->
+        <line x1="160" y1="0" x2="160" y2="560" stroke="rgba(100,60,10,0.14)" stroke-width="0.7" stroke-dasharray="4,4"/>
+        <line x1="320" y1="0" x2="320" y2="560" stroke="rgba(100,60,10,0.14)" stroke-width="0.7" stroke-dasharray="4,4"/>
+        <line x1="480" y1="0" x2="480" y2="560" stroke="rgba(100,60,10,0.14)" stroke-width="0.7" stroke-dasharray="4,4"/>
+        <line x1="640" y1="0" x2="640" y2="560" stroke="rgba(100,60,10,0.14)" stroke-width="0.7" stroke-dasharray="4,4"/>
+        <!-- Equador destacado -->
+        <line x1="0" y1="280" x2="860" y2="280" stroke="rgba(160,80,10,0.35)" stroke-width="1.8"/>
+        <text x="8" y="276" font-family="Cinzel,serif" font-size="7" fill="rgba(120,60,10,0.6)" font-style="italic">EQUADOR</text>
+
+        <!-- 3. OCEANO ATLÂNTICO -->
+        <path d="M0,0 L380,0 Q420,40 410,120 Q440,200 420,280 Q440,360 410,440 Q420,510 380,560 L0,560 Z"
+              fill="url(#ocean-grad)" opacity="0.92"/>
+        <!-- Ondas do oceano -->
+        <path d="M0,0 L380,0 Q420,40 410,120 Q440,200 420,280 Q440,360 410,440 Q420,510 380,560 L0,560 Z"
+              fill="url(#waves)" opacity="0.6"/>
+        <!-- Brilho superficial -->
+        <path d="M0,0 L380,0 Q420,40 410,120 Q440,200 420,280 Q440,360 410,440 Q420,510 380,560 L0,560 Z"
+              fill="none" stroke="rgba(180,220,255,0.08)" stroke-width="0"/>
+        <!-- Shimmer diagonal no oceano -->
+        <path d="M20,560 L300,0" stroke="rgba(180,220,255,0.07)" stroke-width="40"/>
+        <path d="M80,560 L360,0" stroke="rgba(180,220,255,0.05)" stroke-width="20"/>
+
+        <!-- 4. CONTINENTE AFRICANO (esquerda, recortado) -->
+        <path d="M0,0 L90,0 Q120,30 115,80 Q140,130 130,190 Q160,250 150,310 Q170,380 145,440 Q130,510 100,560 L0,560 Z"
+              fill="url(#africa-grad)" opacity="0.88"/>
+        <!-- Textura floresta África -->
+        <path d="M0,0 L90,0 Q120,30 115,80 Q140,130 130,190 Q160,250 150,310 Q170,380 145,440 Q130,510 100,560 L0,560 Z"
+              fill="url(#forest)" opacity="0.4"/>
+        <!-- Litoral África -->
+        <path d="M90,0 Q120,30 115,80 Q140,130 130,190 Q160,250 150,310 Q170,380 145,440 Q130,510 100,560"
+              fill="none" stroke="#6a4515" stroke-width="1.5" opacity="0.7"/>
+        <text x="28" y="260" font-family="Cinzel,serif" font-size="9" fill="#5a3510" font-weight="bold"
+              transform="rotate(-8,28,260)" opacity="0.75">AFRICA</text>
+
+        <!-- 5. TERRA DO BRASIL / AMÉRICAS (direita) -->
+        <path d="M860,0 L500,0 Q470,35 475,90 Q450,150 460,220 Q440,290 450,360 Q440,430 460,490 Q475,530 490,560 L860,560 Z"
+              fill="url(#terra-grad)" opacity="0.92"/>
+        <!-- Floresta tropical -->
+        <path d="M860,0 L500,0 Q470,35 475,90 Q450,150 460,220 Q440,290 450,360 Q440,430 460,490 Q475,530 490,560 L860,560 Z"
+              fill="url(#forest)" opacity="0.55"/>
+        <!-- Litoral Brasil -->
+        <path d="M500,0 Q470,35 475,90 Q450,150 460,220 Q440,290 450,360 Q440,430 460,490 Q475,530 490,560"
+              fill="none" stroke="#3a5a18" stroke-width="2" opacity="0.8"/>
+        <!-- Serras/montanhas estilizadas -->
+        <g opacity="0.35" fill="#4a6a28" stroke="#3a5218" stroke-width="0.8">
+          <polygon points="560,180 548,205 572,205"/>
+          <polygon points="575,175 561,205 589,205"/>
+          <polygon points="590,185 576,210 604,210"/>
+          <polygon points="640,300 628,325 652,325"/>
+          <polygon points="655,295 641,325 669,325"/>
+          <polygon points="700,200 688,225 712,225"/>
+          <polygon points="715,195 701,225 729,225"/>
+          <polygon points="760,350 748,375 772,375"/>
+        </g>
+        <!-- Rios -->
+        <path d="M560,320 Q590,340 620,330 Q660,318 700,340 Q740,355 780,345"
+              fill="none" stroke="#2d6090" stroke-width="1.8" opacity="0.45"/>
+        <path d="M600,420 Q630,410 660,420 Q700,435 730,425"
+              fill="none" stroke="#2d6090" stroke-width="1.4" opacity="0.38"/>
+        <text x="580" y="145" font-family="Cinzel,serif" font-size="11" fill="#3a5a18" font-weight="bold"
+              opacity="0.8" letter-spacing="2">TERRA DE</text>
+        <text x="570" y="162" font-family="Cinzel,serif" font-size="11" fill="#3a5a18" font-weight="bold"
+              opacity="0.8" letter-spacing="2">SANTA CRUZ</text>
+
+        <!-- 6. BORDA DO MAPA (moldura ornamental) -->
+        <rect x="6" y="6" width="848" height="548" rx="4"
+              fill="none" stroke="#7a4e18" stroke-width="3" opacity="0.6"/>
+        <rect x="10" y="10" width="840" height="540" rx="3"
+              fill="none" stroke="#c8901e" stroke-width="1" opacity="0.5"/>
+        <rect x="14" y="14" width="832" height="532" rx="2"
+              fill="none" stroke="#7a4e18" stroke-width="0.5" opacity="0.35"/>
+        <!-- Cantoneiras ornamentais -->
+        <g stroke="#8b4e10" stroke-width="1.2" fill="none" opacity="0.55">
+          <path d="M6,36 L6,6 L36,6"/>   <circle cx="21" cy="21" r="5"/>
+          <path d="M824,6 L854,6 L854,36"/> <circle cx="839" cy="21" r="5"/>
+          <path d="M6,524 L6,554 L36,554"/> <circle cx="21" cy="539" r="5"/>
+          <path d="M824,554 L854,554 L854,524"/> <circle cx="839" cy="539" r="5"/>
+        </g>
+        <!-- Marcações de graus nas bordas -->
+        <g font-family="Cinzel,serif" font-size="6.5" fill="#7a4818" opacity="0.65">
+          <text x="152" y="22">10°O</text><text x="312" y="22">20°O</text>
+          <text x="472" y="22">30°O</text><text x="632" y="22">40°O</text>
+          <text x="18" y="84">10°N</text><text x="18" y="204">5°N</text>
+          <text x="18" y="365">5°S</text><text x="18" y="465">10°S</text>
+        </g>
+
+        <!-- 7. CARAVELA PORTUGUESA -->
+        <g transform="translate(205,155) rotate(-8)" opacity="0.82">
+          <!-- Casco -->
+          <path d="M-32,12 Q0,22 32,12 L28,28 Q0,36 -28,28 Z" fill="#8b4a10" stroke="#5a2e08" stroke-width="1"/>
+          <!-- Mastro central -->
+          <line x1="0" y1="-42" x2="0" y2="28" stroke="#5a2e08" stroke-width="1.5"/>
+          <!-- Mastro proa -->
+          <line x1="-18" y1="-18" x2="-22" y2="14" stroke="#5a2e08" stroke-width="1"/>
+          <!-- Vela principal -->
+          <path d="M0,-40 Q18,-22 16,10 Q0,4 -16,10 Q-18,-22 0,-40 Z"
+                fill="#f5e8c0" stroke="#c8a050" stroke-width="0.8" opacity="0.9"/>
+          <!-- Cruz na vela -->
+          <line x1="0" y1="-36" x2="0" y2="6" stroke="#c0281a" stroke-width="2.5" opacity="0.85"/>
+          <line x1="-14" y1="-18" x2="14" y2="-18" stroke="#c0281a" stroke-width="2.5" opacity="0.85"/>
+          <!-- Vela trinquete -->
+          <path d="M-22,-16 Q-12,-6 -12,10 Q-22,6 -32,10 Q-32,-6 -22,-16 Z"
+                fill="#f0e0b0" stroke="#c8a050" stroke-width="0.8" opacity="0.85"/>
+          <!-- Cruz trinquete -->
+          <line x1="-22" y1="-13" x2="-22" y2="8" stroke="#c0281a" stroke-width="1.8" opacity="0.8"/>
+          <line x1="-30" y1="-4" x2="-14" y2="-4" stroke="#c0281a" stroke-width="1.8" opacity="0.8"/>
+          <!-- Ondas sob o navio -->
+          <path d="M-40,30 Q-28,24 -16,30 Q-4,36 8,30 Q20,24 40,30" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.2"/>
+          <path d="M-36,36 Q-20,30 -4,36 Q12,42 36,36" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+          <!-- Bandeira Portugal -->
+          <rect x="-4" y="-42" width="14" height="9" fill="#006600" opacity="0.9"/>
+          <rect x="3" y="-42" width="7" height="9" fill="#ff0000" opacity="0.9"/>
+        </g>
+        <text x="178" y="218" font-family="Cinzel,serif" font-size="7" fill="#1a3d57"
+              font-style="italic" opacity="0.7">Esquadra de Cabral</text>
+
+        <!-- 8. MONSTRO MARINHO -->
+        <g transform="translate(290,410)" opacity="0.55">
+          <path d="M0,0 Q15,-20 30,-5 Q45,10 30,20 Q20,30 5,20 Q-10,12 0,0 Z"
+                fill="#1a5040" stroke="#0d3028" stroke-width="1"/>
+          <circle cx="8" cy="4" r="3" fill="#0d3028"/>
+          <path d="M30,5 Q50,-5 60,8 Q55,18 45,14" fill="#1a5040" stroke="#0d3028" stroke-width="0.8"/>
+          <path d="M25,18 Q30,35 20,40" fill="none" stroke="#1a5040" stroke-width="3"/>
+          <path d="M15,20 Q20,38 10,44" fill="none" stroke="#1a5040" stroke-width="3"/>
+          <path d="M5,15 Q10,33 0,38" fill="none" stroke="#1a5040" stroke-width="3"/>
+        </g>
+
+        <!-- 9. SEGUNDA CARAVELA (menor, distante) -->
+        <g transform="translate(145,360) rotate(5) scale(0.65)" opacity="0.6">
+          <path d="M-28,10 Q0,20 28,10 L24,24 Q0,32 -24,24 Z" fill="#8b4a10" stroke="#5a2e08" stroke-width="1"/>
+          <line x1="0" y1="-36" x2="0" y2="24" stroke="#5a2e08" stroke-width="1.5"/>
+          <path d="M0,-34 Q16,-18 14,8 Q0,2 -14,8 Q-16,-18 0,-34 Z"
+                fill="#f5e8c0" stroke="#c8a050" stroke-width="0.8"/>
+          <line x1="0" y1="-30" x2="0" y2="4" stroke="#c0281a" stroke-width="2.5"/>
+          <line x1="-12" y1="-14" x2="12" y2="-14" stroke="#c0281a" stroke-width="2.5"/>
+        </g>
+
+        <!-- 10. ROSA DOS VENTOS ORNAMENTAL -->
+        <g transform="translate(72,460)">
+          <!-- Círculos externo/interno -->
+          <circle cx="0" cy="0" r="46" fill="rgba(240,215,150,0.55)" stroke="#8b5e18" stroke-width="1.2"/>
+          <circle cx="0" cy="0" r="30" fill="rgba(240,215,150,0.4)" stroke="#8b5e18" stroke-width="0.8"/>
+          <circle cx="0" cy="0" r="8"  fill="#d4a020" stroke="#7a4810" stroke-width="1"/>
+          <!-- Pontas cardeais grandes -->
+          <polygon points="0,-46 -7,-14 7,-14" fill="#d4a020" stroke="#7a4810" stroke-width="0.6"/>
+          <polygon points="0,46  -7,14  7,14"  fill="#d4a020" stroke="#7a4810" stroke-width="0.6"/>
+          <polygon points="-46,0 -14,-7 -14,7" fill="#d4a020" stroke="#7a4810" stroke-width="0.6"/>
+          <polygon points="46,0  14,-7  14,7"  fill="#d4a020" stroke="#7a4810" stroke-width="0.6"/>
+          <!-- Pontas intercardeais -->
+          <polygon points="0,-46 -5,-20 5,-20" fill="#a07820" stroke="#7a4810" stroke-width="0.5"
+                   transform="rotate(45)"/>
+          <polygon points="0,-46 -5,-20 5,-20" fill="#a07820" stroke="#7a4810" stroke-width="0.5"
+                   transform="rotate(135)"/>
+          <polygon points="0,-46 -5,-20 5,-20" fill="#a07820" stroke="#7a4810" stroke-width="0.5"
+                   transform="rotate(225)"/>
+          <polygon points="0,-46 -5,-20 5,-20" fill="#a07820" stroke="#7a4810" stroke-width="0.5"
+                   transform="rotate(315)"/>
+          <!-- Linhas de rumo -->
+          <line x1="0" y1="-46" x2="0" y2="46"  stroke="#8b5e18" stroke-width="0.5" opacity="0.5"/>
+          <line x1="-46" y1="0" x2="46" y2="0"   stroke="#8b5e18" stroke-width="0.5" opacity="0.5"/>
+          <line x1="-33" y1="-33" x2="33" y2="33" stroke="#8b5e18" stroke-width="0.4" opacity="0.4"/>
+          <line x1="33" y1="-33" x2="-33" y2="33" stroke="#8b5e18" stroke-width="0.4" opacity="0.4"/>
+          <!-- Letras cardeais -->
+          <text x="0"   y="-50" text-anchor="middle" font-family="Cinzel,serif" font-size="9" font-weight="bold" fill="#5a3010">N</text>
+          <text x="0"   y="62"  text-anchor="middle" font-family="Cinzel,serif" font-size="9" font-weight="bold" fill="#5a3010">S</text>
+          <text x="-56" y="4"   text-anchor="middle" font-family="Cinzel,serif" font-size="9" font-weight="bold" fill="#5a3010">O</text>
+          <text x="56"  y="4"   text-anchor="middle" font-family="Cinzel,serif" font-size="9" font-weight="bold" fill="#5a3010">L</text>
+        </g>
+
+        <!-- 11. CARTELA DO TÍTULO (cartouche) -->
+        <g transform="translate(580,30)">
+          <path d="M-120,0 Q-130,-22 -110,-28 L110,-28 Q130,-22 120,0 L115,32 Q110,44 95,40 L-95,40 Q-110,44 -115,32 Z"
+                fill="rgba(240,215,150,0.82)" stroke="#8b5e18" stroke-width="1.5"/>
+          <!-- Ornamentos laterais -->
+          <path d="M-120,0 Q-138,10 -125,22 Q-115,30 -115,32" fill="none" stroke="#8b5e18" stroke-width="1"/>
+          <path d="M120,0 Q138,10 125,22 Q115,30 115,32" fill="none" stroke="#8b5e18" stroke-width="1"/>
+          <text x="0" y="-10" text-anchor="middle" font-family="Cinzel,serif" font-size="10" font-weight="bold"
+                fill="#5a2e08" letter-spacing="1.5">DESCOBRIMENTO</text>
+          <text x="0" y="6" text-anchor="middle" font-family="Cinzel,serif" font-size="10" font-weight="bold"
+                fill="#5a2e08" letter-spacing="1.5">DO BRASIL</text>
+          <text x="0" y="24" text-anchor="middle" font-family="Cinzel,serif" font-size="8"
+                fill="#8b4e18" font-style="italic">Anno Domini MDXV</text>
+        </g>
+
+        <!-- 12. TEXTO OCEANO -->
+        <text x="200" y="268" text-anchor="middle" font-family="Cinzel,serif" font-size="13"
+              fill="rgba(240,248,255,0.55)" font-weight="bold" letter-spacing="3"
+              transform="rotate(-12,200,268)">OCEANO</text>
+        <text x="215" y="286" text-anchor="middle" font-family="Cinzel,serif" font-size="13"
+              fill="rgba(240,248,255,0.55)" font-weight="bold" letter-spacing="3"
+              transform="rotate(-12,215,286)">ATLANTICO</text>
+
+        <!-- 13. BALEIA -->
+        <g transform="translate(300,480)" opacity="0.5">
+          <ellipse cx="0" cy="0" rx="30" ry="12" fill="#1a4060" stroke="#0d2840" stroke-width="0.8"/>
+          <path d="M28,-4 Q42,-10 38,0 Q42,10 28,4" fill="#1a4060" stroke="#0d2840" stroke-width="0.8"/>
+          <path d="M-28,0 Q-38,-12 -42,0 Q-38,12 -28,0 Z" fill="#1a4060" stroke="#0d2840" stroke-width="0.8"/>
+          <circle cx="-18" cy="-4" r="2.5" fill="#0d2840"/>
+          <path d="M-8,-12 Q-4,-22 0,-12" fill="none" stroke="rgba(180,220,255,0.6)" stroke-width="1.5"/>
+        </g>
+
+        <!-- 14. VINHETA escurecendo as bordas -->
+        <rect width="860" height="560" fill="url(#vignette)"/>
+      </svg>
+
+      <!-- SVG de trilha (sobre o mapa) -->
+      <svg class="trilha-svg" id="trilha-svg" viewBox="0 0 700 560" preserveAspectRatio="none"></svg>
+
+      <!-- Pontos injetados via JS -->
+      <div id="pontos-container"></div>
+
+    </main>
+
+    <!-- Painel Lateral -->
+    <aside class="painel">
+
+      <div class="painel-secao">
+        <div class="painel-secao-title">📜 Pontuação</div>
+        <div class="pontuacao-num" id="pont-num">0</div>
+        <div class="pontuacao-max">de <span id="pont-max">1000</span> pontos</div>
+      </div>
+
+      <div class="painel-secao">
+        <div class="painel-secao-title">⚓ Dupla Exploradora</div>
+        <div class="dupla-nomes" id="painel-dupla">—</div>
+      </div>
+
+      <div class="painel-secao">
+        <div class="painel-secao-title">🏅 Selos Conquistados</div>
+        <div class="selos-grid" id="selos-grid"></div>
+      </div>
+
+      <div class="painel-secao">
+        <div class="painel-secao-title">🗺 Legenda</div>
+        <div class="legenda-item">
+          <div class="leg-dot" style="background:#d4a017;border:1.5px solid #2b1d0e"></div>
+          Ponto Ativo
+        </div>
+        <div class="legenda-item">
+          <div class="leg-dot" style="background:#2e6b2e;border:1.5px solid rgba(43,29,14,0.3)"></div>
+          Concluído ✓
+        </div>
+        <div class="legenda-item">
+          <div class="leg-dot" style="background:#9e9080;border:1.5px dashed rgba(43,29,14,0.2)"></div>
+          Bloqueado 🔒
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="rodape">
+    <div class="nome">Profª <span>Synthia Duarte</span> © 2026</div>
+    <p class="rodape-sub">Docente Especialista em Informática &amp; Robótica Educativa</p>
+    <div class="contatos">
+      <a href="mailto:profsynthia.fc.duarte@gmail.com">
+        <i class="fas fa-envelope"></i> profsynthia.fc.duarte@gmail.com
+      </a>
+      <a href="https://www.tiktok.com/@robtica.livre?_r=1&_t=ZS-941yz8WfahL" target="_blank">
+        <i class="fab fa-tiktok"></i> TikTok @robtica.livre
+      </a>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ MODAL PERGUNTA ══ -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-num" id="modal-num">1</div>
+      <div class="modal-titulo" id="modal-titulo">Título</div>
+      <button class="modal-fechar" id="modal-fechar" onclick="fecharModal()">✕</button>
+    </div>
+    <div class="modal-corpo">
+      <div class="modal-historia" id="modal-historia"></div>
+      <div class="modal-pergunta-label">⚔ Desafio da Dupla:</div>
+      <div class="modal-pergunta" id="modal-pergunta"></div>
+      <div class="opcoes" id="modal-opcoes"></div>
+      <div class="modal-feedback" id="modal-feedback"></div>
+      <button class="btn-proximo" id="btn-proximo" onclick="proximoPonto()">Avançar para o próximo ponto →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL VITÓRIA ══ -->
+<div class="modal-overlay" id="modal-vitoria-overlay">
+  <div class="modal-vitoria">
+    <div class="vitoria-icon">🏆</div>
+    <div class="vitoria-title">Missão Cumprida!</div>
+    <div class="vitoria-sub" id="vit-sub"></div>
+    <div class="vitoria-dupla" id="vit-dupla"></div>
+    <div class="vitoria-placar">
+      <div class="placar-card">
+        <div class="placar-num" id="vit-acertos">0</div>
+        <div class="placar-label">Acertos</div>
+      </div>
+      <div class="placar-card">
+        <div class="placar-num" id="vit-erros">0</div>
+        <div class="placar-label">Erros</div>
+      </div>
+      <div class="placar-card">
+        <div class="placar-num" id="vit-pontos">0</div>
+        <div class="placar-label">Pontos</div>
+      </div>
+    </div>
+    <div class="vitoria-nota">Nota da Dupla:</div>
+    <div class="nota-display" id="vit-nota">10</div>
+    <div class="vitoria-selos" id="vit-selos"></div>
+    <button class="btn-reiniciar" onclick="reiniciarJogo()">↺ Jogar Novamente</button>
+  </div>
+</div>
+
+<script>
+/* ══ DADOS DOS PONTOS ══ */
+const PONTOS = [
+  {
+    id: 1, titulo: "A Travessia",
+    emoji: "⛵", pos: { x: 18, y: 28 },
+    historia: `Em março de 1500, uma grande esquadra de <strong>13 navios e cerca de 1.200 homens</strong> partiu de Lisboa sob o comando de Pedro Álvares Cabral. O objetivo oficial era chegar às ricas Índias pelo Oriente, buscando especiarias e novas rotas comerciais. Porém, ao navegar pelo Atlântico, os ventos levaram a frota a um rumo inesperado...`,
+    pergunta: "Qual era o destino oficial da esquadra de Cabral ao partir de Lisboa?",
+    opcoes: ["A) O Continente Americano, para colonizá-lo.", "B) As Índias, em busca de especiarias e rotas comerciais.", "C) A África, para buscar escravos para Portugal."],
+    correta: 1,
+    feedback_acerto: "Excelente! A frota de Cabral tinha como missão oficial chegar às Índias pelo caminho marítimo já descoberto por Vasco da Gama. A chegada ao Brasil foi resultado da navegação pelo Atlântico Sul.",
+    feedback_erro: "Atenção, estrategistas! Releiam o texto sobre a grande travessia. O objetivo era seguir a rota das especiarias, rumo às Índias Orientais.",
+    selo: { icon: "⛵", nome: "Navegador" }
+  },
+  {
+    id: 2, titulo: "Monte Pascoal",
+    emoji: "⛰", pos: { x: 62, y: 42 },
+    historia: `No dia <strong>22 de abril de 1500</strong>, os marinheiros avistaram a costa de uma terra desconhecida. O primeiro ponto de terra visto era uma elevação arborizada. A data era muito especial no calendário cristão, e por isso o nome dado àquele lugar carregou uma grande significado religioso para os portugueses.`,
+    pergunta: "Por que o primeiro ponto de terra avistado recebeu o nome de 'Monte Pascoal'?",
+    opcoes: ["A) Era o nome do capitão que primeiro o avistou.", "B) Porque a descoberta aconteceu na semana da Páscoa (Páscoa = Pascoal).", "C) Pascoal era o nome do rei de Portugal na época."],
+    correta: 1,
+    feedback_acerto: "Muito bem! A chegada aconteceu durante a Semana Pascal (da Páscoa), festividade importantíssima para os católicos. Por isso o monte recebeu o nome de Monte Pascoal.",
+    feedback_erro: "Atenção! O nome tem origem religiosa. Releiam sobre a data especial em que a terra foi avistada.",
+    selo: { icon: "⛰", nome: "Observador" }
+  },
+  {
+    id: 3, titulo: "O Contato",
+    emoji: "🤝", pos: { x: 72, y: 30 },
+    historia: `Ao desembarcar na praia, os portugueses encontraram os primeiros habitantes da terra — os povos <strong>Tupi</strong>. O encontro foi marcado pela curiosidade mútua. Os indígenas eram pintados, usavam adornos de penas e não conheciam as roupas europeias. Os portugueses ficaram admirados com a natureza exuberante e com a simplicidade daquele povo.`,
+    pergunta: "Como foi a reação inicial entre portugueses e indígenas na praia?",
+    opcoes: ["A) Os indígenas atacaram imediatamente os navios com arcos e flechas.", "B) Houve curiosidade mútua e o encontro inicial foi pacífico e amigável.", "C) Os portugueses mandaram os indígenas embora e não quiseram contato."],
+    correta: 1,
+    feedback_acerto: "Correto! O primeiro contato foi marcado pela curiosidade de ambos os lados. Os povos Tupi se aproximaram e houve troca de gestos e objetos em clima de paz — pelo menos no início.",
+    feedback_erro: "Releiam sobre o primeiro encontro. A violência veio depois, não no início. O contato inicial foi de surpresa e curiosidade.",
+    selo: { icon: "🤝", nome: "Diplomata" }
+  },
+  {
+    id: 4, titulo: "Carta de Caminha",
+    emoji: "📜", pos: { x: 78, y: 18 },
+    historia: `Pero Vaz de Caminha era o escrivão da expedição. Ele escreveu uma longa e detalhada carta ao <strong>Rei Dom Manuel I</strong> descrevendo tudo o que via: a natureza, os povos, os costumes e as riquezas. Sua carta é considerada o "certidão de nascimento" do Brasil. O principal objetivo era informar o Rei sobre o que havia sido encontrado.`,
+    pergunta: "Qual era o principal objetivo de Caminha ao escrever a carta ao Rei de Portugal?",
+    opcoes: ["A) Contar histórias de aventura para entreter a Corte portuguesa.", "B) Informar o Rei sobre as terras, povos e riquezas da terra encontrada.", "C) Pedir dinheiro pessoal emprestado ao Rei."],
+    correta: 1,
+    feedback_acerto: "Muito bem! A carta era um documento oficial. Caminha descrevia a terra, os povos nativos e as riquezas para que o Rei pudesse decidir o que fazer com aquela nova terra.",
+    feedback_erro: "Atenção, estrategistas! A carta tinha um propósito oficial e histórico. Releiam o trecho sobre Caminha e o Rei.",
+    selo: { icon: "📜", nome: "Escriba" }
+  },
+  {
+    id: 5, titulo: "Primeira Missa",
+    emoji: "✝", pos: { x: 68, y: 55 },
+    historia: `No dia <strong>26 de abril de 1500</strong>, foi realizada a Primeira Missa no Brasil, celebrada pelo frei Henrique de Coimbra. Dois grandes mastros foram fincados na praia formando uma cruz. Para os portugueses, celebrar a missa em uma terra nova era o ato de tomar posse espiritual daquele lugar — colocando-o sob a proteção da Igreja Católica.`,
+    pergunta: "O que a celebração da missa simbolizava para os portugueses em uma terra nova?",
+    opcoes: ["A) Era apenas uma brincadeira religiosa sem nenhum significado.", "B) Significava a posse espiritual da terra em nome da Igreja Católica e do Rei.", "C) Era um pedido de permissão aos indígenas para ficar na terra."],
+    correta: 1,
+    feedback_acerto: "Excelente! A Primeira Missa era um ato simbólico e político poderoso. Ao realizá-la, os portugueses declaravam espiritualmente que aquela terra pertencia ao reino cristão de Portugal.",
+    feedback_erro: "Releiam sobre o significado religioso e político da missa. Era muito mais do que uma celebração simples!",
+    selo: { icon: "✝", nome: "Cronista" }
+  },
+  {
+    id: 6, titulo: "A Posse",
+    emoji: "🪵", pos: { x: 55, y: 65 },
+    historia: `Para marcar oficialmente que uma terra pertencia a Portugal, os portugueses tinham um ritual muito importante: cravar um grande <strong>Padrão de Pedra</strong> com as armas do reino no solo. Além disso, erguiam uma grande cruz de madeira e hasteavam a bandeira. Esses objetos simbolizavam a soberania portuguesa sobre aquele território.`,
+    pergunta: "Qual objeto os portugueses fincaram no solo para marcar que a terra era deles?",
+    opcoes: ["A) Uma bandeira branca de paz.", "B) Um Padrão de Pedra com as armas do reino e uma Cruz de madeira.", "C) Uma estátua de ouro do Rei Dom Manuel."],
+    correta: 1,
+    feedback_acerto: "Correto! O Padrão de Pedra e a Cruz eram os símbolos oficiais de posse territorial portuguesa. Ao cravá-los, declaravam: esta terra pertence a Portugal!",
+    feedback_erro: "Atenção! Releiam sobre os rituais de posse territorial. Qual era o símbolo oficial do reino de Portugal?",
+    selo: { icon: "🪵", nome: "Conquistador" }
+  },
+  {
+    id: 7, titulo: "O Escambo",
+    emoji: "🔄", pos: { x: 45, y: 72 },
+    historia: `Nos primeiros anos após o descobrimento, o comércio entre portugueses e indígenas chamava-se <strong>escambo</strong> — uma troca de objetos sem usar dinheiro. Os indígenas cortavam e carregavam o pesado pau-brasil e, em troca, recebiam dos portugueses objetos simples como facas, espelhos, contas de vidro coloridas e anzóis. Os portugueses lucravam muito com essa troca desigual.`,
+    pergunta: "No sistema de escambo, o que os indígenas ganhavam em troca do trabalho pesado?",
+    opcoes: ["A) Dinheiro de ouro e prata português.", "B) Objetos simples como facas, espelhos e contas de vidro.", "C) Terras e o direito de governar suas aldeias."],
+    correta: 1,
+    feedback_acerto: "Muito bem! O escambo era uma troca extremamente desigual. Os indígenas recebiam objetos de baixo valor pelos portugueses enquanto forneciam trabalho duro e madeira valiosa.",
+    feedback_erro: "Releiam sobre o escambo. O que eram os objetos trocados com os indígenas? Era uma troca justa?",
+    selo: { icon: "🔄", nome: "Mercador" }
+  },
+  {
+    id: 8, titulo: "As Lutas",
+    emoji: "⚔", pos: { x: 35, y: 60 },
+    historia: `Com o passar do tempo, os indígenas perceberam que os portugueses não queriam apenas visitar, mas <strong>dominar suas terras e costumes</strong>. A exploração do trabalho, a tomada das terras e o desrespeito à cultura indígena geraram grandes conflitos armados. O arco e flecha dos guerreiros indígenas enfrentou o trovão das armas de fogo dos invasores europeus.`,
+    pergunta: "Qual foi o principal motivo que transformou o encontro inicial em lutas de resistência?",
+    opcoes: ["A) Os portugueses queriam aprender a caçar com os indígenas.", "B) A tentativa portuguesa de dominar a terra e os povos indígenas.", "C) Os indígenas queriam viajar nas caravelas para a Europa."],
+    correta: 1,
+    feedback_acerto: "Correto! A resistência indígena surgiu em resposta à dominação. À medida que os portugueses avançavam sobre suas terras e modo de vida, os povos nativos lutaram bravamente para defender sua liberdade.",
+    feedback_erro: "Atenção, estrategistas! Releiam o texto sobre a dominação territorial e cultural. Por que os povos indígenas pegaram em armas?",
+    selo: { icon: "⚔", nome: "Guerreiro" }
+  },
+  {
+    id: 9, titulo: "Capitanias",
+    emoji: "🗺", pos: { x: 52, y: 50 },
+    historia: `Para garantir o controle das terras brasileiras e evitar que outros países as tomassem, o Rei de Portugal dividiu o território em <strong>14 faixas de terra</strong>, chamadas Capitanias Hereditárias. Cada faixa foi doada a um nobre (capitão-donatário) que deveria defendê-la e desenvolvê-la às suas próprias custas. Foi o primeiro sistema de governo do Brasil.`,
+    pergunta: "O que o Rei de Portugal fez para garantir que ninguém 'roubasse' a terra dominada?",
+    opcoes: ["A) Construiu uma muralha gigante ao redor do Brasil.", "B) Dividiu o território em 14 Capitanias Hereditárias entregues a nobres.", "C) Pediu ajuda ao Papa para proteger as terras."],
+    correta: 1,
+    feedback_acerto: "Excelente! As Capitanias Hereditárias foram a solução portuguesa para administrar um território imenso. Cada capitão-donatário recebia uma faixa de terra para colonizar e defender.",
+    feedback_erro: "Releiam sobre a divisão do Brasil. Como o Rei organizou o controle de um território tão grande?",
+    selo: { icon: "🗺", nome: "Administrador" }
+  },
+  {
+    id: 10, titulo: "Dominação",
+    emoji: "🙏", pos: { x: 65, y: 75 },
+    historia: `Além dos soldados e dos colonos, os reis portugueses enviaram ao Brasil os <strong>padres jesuítas</strong>. Sua missão era converter os indígenas ao Catolicismo, proibindo suas crenças, línguas e costumes ancestrais. Essa dominação cultural foi uma das mais profundas, pois tentou apagar a identidade dos povos nativos. Porém, muitas tradições resistiram e sobrevivem até hoje.`,
+    pergunta: "Além dos soldados, qual grupo veio para dominar a cultura e a religião dos povos indígenas?",
+    opcoes: ["A) Comerciantes que queriam vender produtos europeus.", "B) Os padres jesuítas, com a missão de converter os indígenas ao Catolicismo.", "C) Artistas que queriam pintar retratos dos índios."],
+    correta: 1,
+    feedback_acerto: "Muito bem! Os jesuítas foram agentes fundamentais da colonização cultural. Ao catequizar os indígenas, tentavam substituir toda uma cosmovisão milenar pela religião europeia.",
+    feedback_erro: "Releiam sobre a dominação cultural e religiosa. Quem eram os agentes dessa missão?",
+    selo: { icon: "🙏", nome: "Historiador" }
+  }
+];
+
+/* ══ ESTADO DO JOGO ══ */
+let estado = {
+  nome1: '', nome2: '',
+  pontosAcertos: 0, pontosErros: 0,
+  pontuacao: 0,
+  pontosConc: [],
+  pontosErrados: [],
+  pontoAtual: 0,
+  modalAberto: false,
+  respondeu: false
+};
+
+/* ══ INIT ══ */
+function iniciarJogo() {
+  const n1 = document.getElementById('nome1').value.trim() || 'Explorador 1';
+  const n2 = document.getElementById('nome2').value.trim() || 'Explorador 2';
+  estado.nome1 = n1; estado.nome2 = n2;
+
+  document.getElementById('tela-inicio').style.display = 'none';
+  document.getElementById('jogo').style.display = 'block';
+  document.getElementById('hdr-dupla').textContent = n1 + ' & ' + n2;
+  document.getElementById('painel-dupla').innerHTML = `<strong>${n1}</strong><br><strong>${n2}</strong>`;
+
+  renderizarSelos();
+  renderizarPontos();
+  atualizarProgresso();
+}
+
+/* ══ RENDER SELOS ══ */
+function renderizarSelos() {
+  const grid = document.getElementById('selos-grid');
+  grid.innerHTML = PONTOS.map((p, i) => `
+    <div class="selo" id="selo-${i}" title="">
+      <span style="font-size:1rem;opacity:0.2">${p.selo.icon}</span>
+      <div class="selo-tooltip">${p.selo.nome}</div>
+    </div>
+  `).join('');
+}
+
+/* ══ RENDER PONTOS NO MAPA ══ */
+function renderizarPontos() {
+  const container = document.getElementById('pontos-container');
+  const mapa = document.getElementById('area-mapa');
+  container.innerHTML = '';
+
+  PONTOS.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'ponto ' + classeEstado(i);
+    div.id = 'ponto-' + i;
+    div.style.left = p.pos.x + '%';
+    div.style.top = p.pos.y + '%';
+    div.innerHTML = `
+      <div class="ponto-marcador">${p.id}</div>
+      <div class="ponto-label">${p.emoji} ${p.titulo}</div>
+    `;
+    div.addEventListener('click', () => clicarPonto(i));
+    container.appendChild(div);
+  });
+
+  desenharTrilha();
+}
+
+function classeEstado(i) {
+  if (estado.pontosConc.includes(i)) {
+    return estado.pontosErrados.includes(i) ? 'errado' : 'concluido';
+  }
+  if (i === estado.pontoAtual) return 'ativo';
+  return 'bloqueado';
+}
+
+/* ══ TRILHA SVG ══ */
+function desenharTrilha() {
+  const svg = document.getElementById('trilha-svg');
+  const mapa = document.getElementById('area-mapa');
+  const w = mapa.offsetWidth || 700;
+  const h = mapa.offsetHeight || 560;
+
+  const pts = PONTOS.map(p => ({
+    x: (p.pos.x / 100) * w,
+    y: (p.pos.y / 100) * h
+  }));
+
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  for (let i = 1; i < pts.length; i++) {
+    const px = pts[i - 1]; const cx = pts[i];
+    const mx = (px.x + cx.x) / 2;
+    d += ` C ${mx},${px.y} ${mx},${cx.y} ${cx.x},${cx.y}`;
+  }
+
+  svg.innerHTML = `
+    <defs>
+      <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6 Z" fill="#b8860b" opacity="0.5"/>
+      </marker>
+    </defs>
+    <path d="${d}" fill="none" stroke="#b8860b" stroke-width="1.5"
+      stroke-dasharray="6,4" opacity="0.45" marker-end="url(#arr)"/>
+  `;
+}
+
+window.addEventListener('resize', desenharTrilha);
+
+/* ══ CLIQUE NO PONTO ══ */
+function clicarPonto(i) {
+  if (estado.pontosConc.includes(i)) return;
+  if (i !== estado.pontoAtual) {
+    mostrarToast('🔒 Conclua o ponto anterior primeiro!');
+    return;
+  }
+  abrirModal(i);
+}
+
+/* ══ MODAL ══ */
+function abrirModal(i) {
+  const p = PONTOS[i];
+  estado.modalAberto = true;
+  estado.respondeu = false;
+
+  document.getElementById('modal-num').textContent = p.id;
+  document.getElementById('modal-titulo').textContent = p.emoji + ' ' + p.titulo;
+  document.getElementById('modal-historia').innerHTML = p.historia;
+  document.getElementById('modal-pergunta').textContent = p.pergunta;
+  document.getElementById('modal-feedback').className = 'modal-feedback';
+  document.getElementById('modal-feedback').textContent = '';
+  document.getElementById('btn-proximo').style.display = 'none';
+  document.getElementById('modal-fechar').style.display = '';
+
+  const opcDiv = document.getElementById('modal-opcoes');
+  opcDiv.innerHTML = '';
+  const letras = ['A', 'B', 'C'];
+  p.opcoes.forEach((op, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'opcao';
+    btn.innerHTML = `<span class="opcao-letra">${letras[idx]})</span> ${op.replace(/^[A-C]\) /, '')}`;
+    btn.addEventListener('click', () => responder(idx, i));
+    opcDiv.appendChild(btn);
+  });
+
+  document.getElementById('modal-overlay').classList.add('aberto');
+}
+
+function fecharModal() {
+  document.getElementById('modal-overlay').classList.remove('aberto');
+  estado.modalAberto = false;
+}
+
+/* ══ RESPONDER ══ */
+function responder(idx, pontoIdx) {
+  if (estado.respondeu) return;
+  estado.respondeu = true;
+
+  const p = PONTOS[pontoIdx];
+  const btns = document.querySelectorAll('.opcao');
+  btns.forEach(b => b.disabled = true);
+
+  const feedback = document.getElementById('modal-feedback');
+  const proximo = document.getElementById('btn-proximo');
+
+  const frasesAcerto = [
+    '🎉 Parabéns! Resposta perfeita!',
+    '⭐ Incrível! Vocês dominam a história!',
+    '🏆 Excelente! A dupla arrasou!',
+    '👏 Muito bem! Continuem assim!',
+    '🌟 Brilhante! Segurem esse ritmo!'
+  ];
+  const frasesErro = [
+    '📚 Ah, vamos estudar mais! Releiam o texto com atenção.',
+    '💪 Não desanimem! Leiam novamente e avancem mais sábios.',
+    '🧐 Quase lá! Esse tema merece mais atenção na releitura.',
+    '📖 Ah, essa escapou! Mas estudando, vocês chegam lá!',
+    '🔍 Hmm, hora de rever! O texto dá a dica. Vamos lá!'
+  ];
+
+  if (idx === p.correta) {
+    btns[idx].classList.add('correta');
+    const frase = frasesAcerto[Math.floor(Math.random() * frasesAcerto.length)];
+    feedback.className = 'modal-feedback acerto';
+    feedback.textContent = frase + ' — ' + p.feedback_acerto;
+    estado.pontuacao += 100;
+    estado.pontosAcertos++;
+    conquistarSelo(pontoIdx);
+
+    document.getElementById('pont-num').textContent = estado.pontuacao;
+    estado.pontosConc.push(pontoIdx);
+    atualizarPontoMapa(pontoIdx);
+    atualizarProgresso();
+    document.getElementById('modal-fechar').style.display = 'none';
+
+    if (pontoIdx < PONTOS.length - 1) {
+      estado.pontoAtual = pontoIdx + 1;
+      atualizarPontoMapa(pontoIdx + 1);
+      // Volta ao mapa após 12s para melhor leitura
+      setTimeout(() => {
+        fecharModal();
+        const prox = PONTOS[pontoIdx + 1];
+        mostrarToast('⭐ Clique em "' + prox.emoji + ' ' + prox.titulo + '" para continuar!');
+      }, 12000);
+    } else {
+      // Último ponto — mostra vitória após delay para leitura
+      setTimeout(() => { fecharModal(); mostrarVitoria(); }, 12000);
+    }
+
+  } else {
+    btns[idx].classList.add('errada');
+    btns[p.correta].classList.add('correta');
+    const fraseErr = frasesErro[Math.floor(Math.random() * frasesErro.length)];
+    feedback.className = 'modal-feedback erro';
+    feedback.textContent = fraseErr + ' — ' + p.feedback_erro;
+    estado.pontosErros++;
+    estado.pontosErrados.push(pontoIdx);
+
+    document.getElementById('pont-num').textContent = estado.pontuacao;
+    estado.pontosConc.push(pontoIdx);
+    atualizarPontoMapa(pontoIdx);
+    atualizarProgresso();
+    document.getElementById('modal-fechar').style.display = 'none';
+
+    if (pontoIdx < PONTOS.length - 1) {
+      estado.pontoAtual = pontoIdx + 1;
+      atualizarPontoMapa(pontoIdx + 1);
+      // Aumenta tempo para leitura do erro: mostra botão após 12 segundos
+      setTimeout(() => {
+        proximo.style.display = 'block';
+      }, 12000);
+    } else {
+      proximo.textContent = '🏆 Ver Resultado Final →';
+      // Aumenta tempo para leitura do erro no último ponto: botão após 12 segundos
+      setTimeout(() => {
+        proximo.style.display = 'block';
+        proximo.onclick = () => { fecharModal(); mostrarVitoria(); };
+      }, 12000);
+    }
+  }
+}
+
+function proximoPonto() {
+  fecharModal();
+}
+
+/* ══ ATUALIZAR MAPA ══ */
+function atualizarPontoMapa(i) {
+  const el = document.getElementById('ponto-' + i);
+  if (el) {
+    el.className = 'ponto ' + classeEstado(i);
+  }
+}
+
+/* ══ SELOS ══ */
+function conquistarSelo(i) {
+  const el = document.getElementById('selo-' + i);
+  if (!el) return;
+  const p = PONTOS[i];
+  el.classList.add('conquistado');
+  el.innerHTML = `<span style="font-size:1.1rem">${p.selo.icon}</span><div class="selo-tooltip">${p.selo.nome}</div>`;
+}
+
+/* ══ PROGRESSO ══ */
+function atualizarProgresso() {
+  const c = estado.pontosConc.length;
+  document.getElementById('prog-texto').textContent = c + '/10';
+  document.getElementById('prog-bar').style.width = (c * 10) + '%';
+}
+
+/* ══ VITÓRIA ══ */
+function mostrarVitoria() {
+  const nota = Math.round((estado.pontosAcertos / 10) * 10 * 10) / 10;
+  const emojis = ['😟','😕','🙂','😊','🌟'];
+  let emojiIdx = Math.min(Math.floor(nota / 2), 4);
+
+  document.getElementById('vit-sub').textContent = nota >= 7
+    ? '🌟 Parabéns! Vocês dominaram a história do Descobrimento!'
+    : nota >= 5
+    ? '📚 Bom esforço! Revisem os pontos para aprender ainda mais.'
+    : '💪 Continue estudando! A história do Brasil espera por vocês!';
+
+  document.getElementById('vit-dupla').textContent =
+    '⚓ ' + estado.nome1 + ' & ' + estado.nome2;
+  document.getElementById('vit-acertos').textContent = estado.pontosAcertos;
+  document.getElementById('vit-erros').textContent = estado.pontosErros;
+  document.getElementById('vit-pontos').textContent = estado.pontuacao;
+  document.getElementById('vit-nota').textContent = nota.toFixed(1);
+
+  // Selos na vitória
+  const vitSelos = document.getElementById('vit-selos');
+  vitSelos.innerHTML = estado.pontosConc.map(i => {
+    const p = PONTOS[i];
+    const conquistou = estado.pontosAcertos > 0;
+    return `<div class="selo conquistado" style="width:42px;height:42px;font-size:1.3rem">
+      ${p.selo.icon}
+      <div class="selo-tooltip">${p.selo.nome}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('modal-vitoria-overlay').classList.add('aberto');
+}
+
+/* ══ REINICIAR ══ */
+function reiniciarJogo() {
+  estado = {
+    nome1: estado.nome1, nome2: estado.nome2,
+    pontosAcertos: 0, pontosErros: 0,
+    pontuacao: 0, pontosConc: [],
+    pontosErrados: [],
+    pontoAtual: 0, modalAberto: false, respondeu: false
+  };
+  document.getElementById('modal-vitoria-overlay').classList.remove('aberto');
+  document.getElementById('pont-num').textContent = '0';
+  renderizarSelos();
+  renderizarPontos();
+  atualizarProgresso();
+  document.getElementById('hdr-dupla').textContent = estado.nome1 + ' & ' + estado.nome2;
+  document.getElementById('tela-inicio').style.display = 'flex';
+  document.getElementById('jogo').style.display = 'none';
+}
+
+/* ══ TOAST ══ */
+function mostrarToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#2b1d0e;color:#f5e6c8;padding:10px 20px;border-radius:8px;
+    font-family:'Cinzel',serif;font-size:0.85rem;z-index:999;
+    border:1px solid #b8860b;box-shadow:0 4px 12px rgba(0,0,0,0.4);
+    animation:fadeIn 0.2s ease;`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+// Iniciar com ponto 0 ativo
+window.addEventListener('load', () => {
+  setTimeout(desenharTrilha, 100);
+});
+
+/* ══════════════════════════════════════════
+   MOTOR DE ÁUDIO — Web Audio API
+   Todos os sons gerados programaticamente
+══════════════════════════════════════════ */
+let audioCtx = null;
+let masterGain = null;
+let bgLoop = null;
+let bgGain = null;
+let mudoAtivo = false;
+
+function getCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 1;
+    masterGain.connect(audioCtx.destination);
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function toggleMudo() {
+  mudoAtivo = !mudoAtivo;
+  if (masterGain) masterGain.gain.value = mudoAtivo ? 0 : 1;
+  document.getElementById('btn-mudo').textContent = mudoAtivo ? '🔇' : '🔊';
+}
+
+/* ── Utilitários de nota ── */
+function nota(freq, inicio, dur, tipo, gainVal, ctx, dest, detune) {
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = tipo || 'sine';
+  osc.frequency.value = freq;
+  if (detune) osc.detune.value = detune;
+  g.gain.setValueAtTime(0, inicio);
+  g.gain.linearRampToValueAtTime(gainVal, inicio + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.001, inicio + dur);
+  osc.connect(g); g.connect(dest);
+  osc.start(inicio); osc.stop(inicio + dur + 0.05);
+}
+
+function ruido(inicio, dur, gainVal, ctx, dest) {
+  const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const filt = ctx.createBiquadFilter();
+  filt.type = 'bandpass'; filt.frequency.value = 1200; filt.Q.value = 0.8;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(gainVal, inicio);
+  g.gain.exponentialRampToValueAtTime(0.001, inicio + dur);
+  src.connect(filt); filt.connect(g); g.connect(dest);
+  src.start(inicio); src.stop(inicio + dur + 0.05);
+}
+
+/* ── MÚSICA AMBIENTE (loop marítimo) ── */
+function iniciarMusica() {
+  const ctx = getCtx();
+  if (bgLoop) return;
+  bgGain = ctx.createGain();
+  bgGain.gain.value = 0.18;
+  bgGain.connect(masterGain);
+
+  function criarLoop() {
+    const durTotal = 8;
+    const t0 = ctx.currentTime + 0.1;
+    // Drone base — cordas graves
+    const droneFreqs = [65.4, 98, 130.8];
+    droneFreqs.forEach(f => nota(f, t0, durTotal, 'sawtooth', 0.06, ctx, bgGain, 0));
+    // Acordes de alaúde estilo renascentista
+    const acords = [
+      [196, 246.9, 293.7],   // Sol maior
+      [164.8, 207.7, 246.9], // Mi menor
+      [174.6, 220, 261.6],   // Fá maior
+      [196, 246.9, 329.6],   // Sol maior 2
+    ];
+    acords.forEach((acord, ai) => {
+      const t = t0 + ai * 2;
+      acord.forEach(f => {
+        nota(f, t, 1.7, 'triangle', 0.09, ctx, bgGain, 0);
+        nota(f, t + 0.06, 1.6, 'triangle', 0.06, ctx, bgGain, 8);
+      });
+    });
+    // Flautim melódico (voz superior)
+    const melodia = [392, 440, 493.9, 440, 392, 349.2, 392, 440];
+    const dur_mel = [0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 1.5];
+    let tMel = t0 + 0.25;
+    melodia.forEach((f, i) => {
+      nota(f, tMel, dur_mel[i] * 0.85, 'sine', 0.12, ctx, bgGain, 0);
+      tMel += dur_mel[i];
+    });
+    // Percussão suave (tambor de pele)
+    [0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0].forEach(offset => {
+      ruido(t0 + offset, 0.12, 0.08, ctx, bgGain);
+      nota(80, t0 + offset, 0.15, 'sine', 0.12, ctx, bgGain, 0);
+    });
+    [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5].forEach(offset => {
+      ruido(t0 + offset, 0.07, 0.04, ctx, bgGain);
+    });
+
+    bgLoop = setTimeout(criarLoop, (durTotal - 0.3) * 1000);
+  }
+  criarLoop();
+}
+
+function pararMusica() {
+  if (bgLoop) { clearTimeout(bgLoop); bgLoop = null; }
+  if (bgGain) { bgGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5); }
+}
+
+/* ── FANFARRA DE INÍCIO ── */
+function somInicio() {
+  const ctx = getCtx();
+  const g = ctx.createGain(); g.gain.value = 0.5; g.connect(masterGain);
+  const t = ctx.currentTime + 0.05;
+  // Arpejo ascendente de trompete
+  const notas = [261.6, 329.6, 392, 523.3, 659.3, 784];
+  const dur   = [0.12,  0.12,  0.12, 0.14,  0.14,  0.6];
+  let tc = t;
+  notas.forEach((f, i) => {
+    nota(f, tc, dur[i], 'sawtooth', 0.35, ctx, g, 0);
+    nota(f * 1.003, tc, dur[i], 'sawtooth', 0.15, ctx, g, 1200);
+    tc += dur[i] - 0.01;
+  });
+  // Redobro final
+  nota(784, tc, 0.2, 'sawtooth', 0.3, ctx, g, 0);
+  nota(1046.5, tc + 0.18, 0.5, 'sawtooth', 0.3, ctx, g, 0);
+  // Bumbo
+  nota(55, t, 0.3, 'sine', 0.5, ctx, g, 0);
+  ruido(t, 0.08, 0.3, ctx, g);
+}
+
+/* ── CLIQUE NO PONTO DO MAPA ── */
+function somClique() {
+  const ctx = getCtx();
+  const g = ctx.createGain(); g.gain.value = 0.4; g.connect(masterGain);
+  const t = ctx.currentTime;
+  nota(880,  t,       0.08, 'sine', 0.4, ctx, g, 0);
+  nota(1174, t + 0.07, 0.12, 'sine', 0.35, ctx, g, 0);
+  nota(1318, t + 0.14, 0.2,  'sine', 0.28, ctx, g, 0);
+  ruido(t, 0.04, 0.15, ctx, g);
+}
+
+/* ── ACERTO ── */
+function somAcerto() {
+  const ctx = getCtx();
+  const g = ctx.createGain(); g.gain.value = 0.45; g.connect(masterGain);
+  const t = ctx.currentTime + 0.05;
+  // Arpejo de vitória em Dó maior
+  const notas = [523.3, 659.3, 784, 1046.5];
+  const durs  = [0.15,  0.15,  0.15, 0.5];
+  let tc = t;
+  notas.forEach((f, i) => {
+    nota(f, tc, durs[i], 'triangle', 0.4, ctx, g, 0);
+    nota(f, tc, durs[i], 'sine',     0.2, ctx, g, 1200);
+    tc += durs[i] - 0.01;
+  });
+  // Shimmer final
+  nota(2093, tc, 0.4, 'sine', 0.15, ctx, g, 0);
+  // Tambor alegre
+  nota(130.8, t, 0.1, 'sine', 0.4, ctx, g, 0);
+  ruido(t, 0.06, 0.25, ctx, g);
+  nota(130.8, t + 0.25, 0.1, 'sine', 0.3, ctx, g, 0);
+  ruido(t + 0.25, 0.06, 0.2, ctx, g);
+}
+
+/* ── ERRO ── */
+function somErro() {
+  const ctx = getCtx();
+  const g = ctx.createGain(); g.gain.value = 0.4; g.connect(masterGain);
+  const t = ctx.currentTime + 0.05;
+  // Descida triste de trompete
+  nota(392,   t,       0.2, 'sawtooth', 0.35, ctx, g, 0);
+  nota(349.2, t + 0.18, 0.2, 'sawtooth', 0.3,  ctx, g, 0);
+  nota(293.7, t + 0.35, 0.4, 'sawtooth', 0.28, ctx, g, 0);
+  nota(261.6, t + 0.72, 0.5, 'sawtooth', 0.22, ctx, g, 0);
+  // Bumbo surdo
+  nota(65.4, t, 0.4, 'sine', 0.4, ctx, g, 0);
+  ruido(t, 0.1, 0.2, ctx, g);
+}
+
+/* ── CONQUISTA DE SELO ── */
+function somSelo() {
+  const ctx = getCtx();
+  const g = ctx.createGain(); g.gain.value = 0.38; g.connect(masterGain);
+  const t = ctx.currentTime;
+  // Brilho de sino ascendente
+  const freqs = [523.3, 659.3, 784, 1046.5, 1318.5, 1568];
+  freqs.forEach((f, i) => {
+    nota(f, t + i * 0.07, 0.35, 'sine', 0.3 - i * 0.03, ctx, g, 0);
+    nota(f * 2, t + i * 0.07, 0.2, 'sine', 0.1, ctx, g, 0);
+  });
+}
+
+/* ── RETORNO AO MAPA ── */
+function somMapa() {
+  const ctx = getCtx();
+  const g = ctx.createGain(); g.gain.value = 0.32; g.connect(masterGain);
+  const t = ctx.currentTime;
+  nota(440,   t,       0.12, 'triangle', 0.35, ctx, g, 0);
+  nota(554.4, t + 0.1, 0.12, 'triangle', 0.3,  ctx, g, 0);
+  nota(659.3, t + 0.2, 0.25, 'triangle', 0.28, ctx, g, 0);
+  nota(880,   t + 0.3, 0.4,  'sine',     0.22, ctx, g, 0);
+}
+
+/* ── VITÓRIA ÉPICA ── */
+function somVitoria() {
+  const ctx = getCtx();
+  const g = ctx.createGain(); g.gain.value = 0.55; g.connect(masterGain);
+  const t = ctx.currentTime + 0.1;
+
+  // Fanfarra épica: três trompetes em cânone
+  const fanf = [523.3, 659.3, 784, 659.3, 784, 1046.5, 784, 1046.5, 1318.5, 1046.5, 1318.5, 1568];
+  const dFan = [0.15, 0.15, 0.15, 0.1, 0.1, 0.2, 0.1, 0.1, 0.2, 0.1, 0.1, 0.8];
+  let tc = t;
+  fanf.forEach((f, i) => {
+    nota(f,         tc, dFan[i], 'sawtooth', 0.35, ctx, g, 0);
+    nota(f * 1.003, tc, dFan[i], 'sawtooth', 0.18, ctx, g, 1200);
+    nota(f * 0.998, tc, dFan[i], 'sawtooth', 0.12, ctx, g, -1200);
+    tc += dFan[i];
+  });
+  // Acorde final glorioso
+  [523.3, 659.3, 784, 1046.5, 1318.5].forEach((f, i) => {
+    nota(f, tc,          1.5, 'triangle', 0.25 - i * 0.02, ctx, g, 0);
+    nota(f, tc + 0.05,   1.4, 'sine',     0.12,            ctx, g, 800);
+  });
+  // Caixa e bumbo militar
+  [0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8].forEach(off => {
+    nota(65.4, t + off, 0.15, 'sine', 0.5, ctx, g, 0);
+    ruido(t + off, 0.08, 0.3, ctx, g);
+  });
+  [0.15, 0.45, 0.75, 1.05, 1.35].forEach(off => {
+    ruido(t + off, 0.05, 0.18, ctx, g);
+  });
+}
+
+/* ══ INJEÇÃO DE SOM NAS FUNÇÕES EXISTENTES ══ */
+
+// Sobrescreve iniciarJogo para adicionar sons
+const _iniciarJogo = iniciarJogo;
+iniciarJogo = function() {
+  _iniciarJogo();
+  somInicio();
+  setTimeout(iniciarMusica, 600);
+};
+
+// Sobrescreve abrirModal para som de clique
+const _abrirModal = abrirModal;
+abrirModal = function(i) {
+  somClique();
+  _abrirModal(i);
+};
+
+// Sobrescreve conquistarSelo para som de sino
+const _conquistarSelo = conquistarSelo;
+conquistarSelo = function(i) {
+  _conquistarSelo(i);
+  setTimeout(somSelo, 120);
+};
+
+// Sobrescreve mostrarVitoria para fanfarra épica
+const _mostrarVitoria = mostrarVitoria;
+mostrarVitoria = function() {
+  pararMusica();
+  _mostrarVitoria();
+  setTimeout(somVitoria, 200);
+};
+
+// Sobrescreve reiniciarJogo para limpar áudio
+const _reiniciarJogo = reiniciarJogo;
+reiniciarJogo = function() {
+  pararMusica();
+  bgLoop = null; bgGain = null;
+  _reiniciarJogo();
+};
+
+// Sons de acerto/erro via patch no responder
+const _responder = responder;
+responder = function(idx, pontoIdx) {
+  const p = PONTOS[pontoIdx];
+  if (idx === p.correta) {
+    somAcerto();
+    // Som de retorno ao mapa após delay
+    setTimeout(somMapa, 2000);
+  } else {
+    somErro();
+  }
+  _responder(idx, pontoIdx);
+};
+</script>
+</body>
+</html>
